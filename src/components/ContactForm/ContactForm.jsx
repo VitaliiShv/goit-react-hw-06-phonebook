@@ -23,8 +23,8 @@ const ContactForm = ({ onSubmit }) => {
   };
 
   const resetForm = () => {
-    setState({ ...state });
-  };
+  setState({ name: '', number: '' });
+};
 
   const { name, number } = state;
 

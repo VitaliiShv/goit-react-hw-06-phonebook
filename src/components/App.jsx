@@ -1,49 +1,44 @@
 import { useState, useEffect } from 'react';
-import { nanoid } from 'nanoid';
+
 import ContactForm from './ContactForm/ContactForm';
 import Filter from './Filter/Filter';
 import ContactList from './ContactList/ContactList';
 
-import { Provider } from "react-redux";
-import store from 'redux/store';
-import {useSelector} from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux';
+import { addContact,deleteContact } from 'redux/actions';
 
 const App = () => {
   const [filter, setFilter] = useState('');
 
   const contacts = useSelector(store => store.contacts);
-  console.log(contacts);
+  
+  const dispatch = useDispatch();
+  
 
   // useEffect(() => {
   //   localStorage.setItem('contacts', JSON.stringify(contacts));
   // }, [contacts]);
 
-  // const isDuplicate = name => {
-  //   if (contacts.find(contact => contact.name === name)) {
-  //     alert(`${name} is already in contact list`);
-  //     return;
-  //   }
-  // };
+  const isDuplicate = name => {
+    if (contacts.find(contact => contact.name === name)) {
+      alert(`${name} is already in contact list`);
+      return true;
+    }
+  };
 
-  // const addContact = ({ name, number }) => {
-  //   isDuplicate(name);
+  const onAddContact = ({ name, number }) => {
+    if (isDuplicate(name)){
+      return;
+    };
 
-  //   setContacts(prevContacts => {
-  //     const contact = {
-  //       id: nanoid(),
-  //       name,
-  //       number,
-  //     };
+    const action = addContact({ name, number });
+    dispatch(action);
+  };
 
-  //     return [contact, ...prevContacts];
-  //   });
-  // };
-
-  // const deleteContact = contactId => {
-  //   setContacts(prevContacts =>
-  //     prevContacts.filter(contact => contact.id !== contactId)
-  //   );
-  // };
+  const onDeleteContact = contactId => {
+    const action = deleteContact(contactId);
+    dispatch(action);
+  };
 
   const changeFilter = ({ target }) => setFilter(target.value);
 
@@ -60,17 +55,18 @@ const App = () => {
   const visibleContacts = getVisibleContacts();
 
   return (
-    <Provider store={store}>
+    
       <><h1>Phonebook</h1>
-      <ContactForm  />
+      <ContactForm onSubmit={onAddContact}  />
       <h2>Contacts</h2>
       <Filter value={filter} onChange={changeFilter} />
       {contacts.length > 0 && (
         <ContactList
-          contacts={visibleContacts}
+          onDeleteContact={onDeleteContact}
+          contacts={contacts}
         />
       )}</>
-    </Provider>
+    
   );
 };
 
